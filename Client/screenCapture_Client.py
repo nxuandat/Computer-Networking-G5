@@ -60,9 +60,3 @@ class ScreenCapture:
         os.remove("picture.png")
         self.Screenshot.destroy()
 
-
-# Example usage:
-# root = Tk()
-# client = None  # Replace with your client object
-# capture = ScreenCapture(client)
-# root.mainloop()
