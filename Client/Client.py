@@ -9,9 +9,9 @@ from tkinter import messagebox
 from PIL import ImageTk, Image
 from PIL import Image
 import Keystroke_Client				# KeyStroke.py
-import processRunning_Client		# process_function.py
+import processRunning_Client 		# process_function.py
 import appRunning_Client			# application_function.py
-import screenCapture_Client			# screenCapture.py
+import screenCapture_Client 			# screenCapture.py
 
 # AF_INET        : cho biết đang yêu cầu một socket Internet Protocol(IP), cụ thể là IPv4
 # SOCK_STREAM    : chỉ loại kết nối TCP IP hoặc UDP . Chương trình nhóm em sẽ chạy trên một cổng kết nối TCP
@@ -103,8 +103,7 @@ class Main:
 # Hàm chụp ảnh màn hình
     def screenCapture(self, Client):
         try:
-            screenCapture_Client.screenCapture(
-                self, Client)  # Đọc hàm screenCapture
+            screenCapture_Client.screencapture(Client)  # Đọc hàm screenCapture
         except:
             # Thông báo lỗi nếu hàm lỗi
             messagebox.showinfo("Error !!!", "Lỗi kết nối")
@@ -120,8 +119,7 @@ class Main:
 # Hàm khởi động các process (Watch, Kill, Start)
     def process_function(self, Client):
         try:
-            processRunning_Client.process_function(
-                self, Client)  # Đọc hàm process_function
+            processRunning_Client.processrunning(Client)  # Đọc hàm process_function
         except:
             messagebox.showinfo("Error !!!", "Lỗi kết nối ")
 

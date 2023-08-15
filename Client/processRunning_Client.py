@@ -1,4 +1,8 @@
-from tkinter import Tk, Entry, Button, messagebox, END
+from tkinter import Tk, W
+from tkinter.ttk import Frame, Button, Entry
+from tkinter import ttk
+from tkinter import *
+from tkinter import messagebox
 
 
 
@@ -21,7 +25,7 @@ class ProcessWindow:
         start_button.grid(row=0, column=0, padx=8) # Vi trí của button trong grid
 
         watch_button = Button(self.process, text="Watch", font="Helvetica 10 bold", padx=30, pady=20,  
-                              command=self.watch_processes, bd=5, bg="#000940", fg="#fff", activebackground='#fff') # Định dạng button watch
+                      command=lambda: self.watch_processes(self.client), bd=5, bg="#000940", fg="#fff", activebackground='#fff') # Định dạng button watch
         watch_button.grid(row=0, column=1, padx=8) # Vị trí của button trong grid
 
         kill_button = Button(self.process, text="Kill", font="Helvetica 10 bold", padx=30, pady=20,
@@ -36,14 +40,89 @@ class ProcessWindow:
         if self.process_activity:
             self.process_activity.destroy()  # Xóa các tiến trình hiện tại
 
-    def watch_processes(self): # Hàm watch_processes dùng để xem các chương trình
-        self.clear()
-
+    def watch_processes(self,client): # Hàm watch_processes dùng để xem các chương trình
+        global process_activity                    # Khai báo biến process_activity
+        global PORT                             # Khai báo biến PORT
+        PORT = 1234                             # Khai báo PORT
+        self.length = 0                         # Khai báo biến length
+        self.ID = [''] * 1000                   # Khai báo biến ID
+        self.Name = [''] * 1000                 # Khai báo biến Name
+        self.Thread = [''] * 1000               # Khai báo biến Thread
         try:
-            self.client.sendall(bytes("Watch_ProcessRunning", "utf-8"))  # Gửi lệnh Watch_ProcessRunning cho server
+            # Gửi thông điệp Watch_ProcessRunning
+            client.sendall(bytes("Watch_ProcessRunning", "utf-8"))
         except:
-            messagebox.showinfo("Error !!!", "Lỗi kết nối") # Thông báo lỗi
-            self.process.destroy()
+            # Thông báo lỗi
+            messagebox.showinfo("Error !!!", "Lỗi kết nối ")
+            self.process.destroy()                                  # Xóa cửa sổ
+
+        # Receive data
+        try:
+            self.length = client.recv(1024).decode(
+                "utf-8")         # Nhận dữ liệu từ server
+            # Chuyển dữ liệu từ string sang int
+            self.length = int(self.length)
+            # Vòng lặp để nhận dữ liệu cho data
+            for i in range(self.length):
+                self.data = client.recv(1024).decode(
+                    "utf-8")       # Nhận dữ liệu từ server
+                # Chuyển dữ liệu từ string sang int
+                self.ID[i] = self.data
+                # Gửi dữ liệu từ client lên server
+                client.sendall(bytes(self.data, "utf-8"))
+
+            # Vòng lặp để nhận dữ liệu cho name
+            for i in range(self.length):
+                self.data = client.recv(1024).decode(
+                    "utf-8")       # Nhận dữ liệu từ server
+                # Chuyển dữ liệu từ string sang int
+                self.Name[i] = self.data
+                # Gửi dữ liệu từ client lên server
+                client.sendall(bytes(self.data, "utf-8"))
+
+            # Vòng lặp để nhận dữ liệu cho thread
+            for i in range(self.length):
+                self.data = client.recv(1024).decode(
+                    "utf-8")       # Nhận dữ liệu từ server
+                # Chuyển dữ liệu từ string sang int
+                self.Thread[i] = self.data
+                # Gửi dữ liệu từ client lên server
+                client.sendall(bytes(self.data, "utf-8"))
+        except:
+            # Thông báo lỗi
+            messagebox.showinfo("Error !!!", "Lỗi kết nối ")
+
+        self.process_activity = Frame(
+            self.process, bg="white", padx=20, pady=20, borderwidth=5)
+        self.process_activity.grid(row=1, columnspan=5, padx=20)
+
+        # Khai báo scrollbar
+        self.scrollbar = Scrollbar(self.process_activity)
+        self.scrollbar.pack(side=RIGHT, fill=Y)                 # Đặt scrollbar
+        # Khai báo treeview
+        self.mybar = ttk.Treeview(
+            self.process_activity, yscrollcommand=self.scrollbar.set)
+        self.mybar.pack()                                       # Đặt treeview
+        self.scrollbar.config(command=self.mybar.yview)         # Đặt scrollbar
+
+        self.mybar['columns'] = ("1", "2")                      # Khai báo cột
+        self.mybar.column("#0", anchor=CENTER, width=200,
+                          minwidth=25)                          # Đặt cột #0
+        # Đặt cột 1
+        self.mybar.column("1", anchor=CENTER, width=100)
+        # Đặt cột 2
+        self.mybar.column("2", anchor=CENTER, width=100)
+
+        # Đặt tiêu đề cột #0
+        self.mybar.heading("#0", text="Process Name", anchor=W)
+        # Đặt tiêu đề cột 1
+        self.mybar.heading("1", text="ID", anchor=CENTER)
+        # Đặt tiêu đề cột 2
+        self.mybar.heading("2", text="Thread", anchor=CENTER)
+        for i in range(self.length):
+            self.mybar.insert(parent='', index='end', iid=0+i, text=self.Name[i], values=(
+                self.ID[i], self.Thread[i]))               
+        
 
     def kill_process(self):     # Hàm kill_processes dùng để dừng các chương trình
         self.clear()                    # Tạo cửa sổ screen_KillTask khi button Kill được click
@@ -94,3 +173,6 @@ class ProcessWindow:
             messagebox.showinfo("Error !!!", "Không tìm thấy chương trình")
 
 
+def processrunning(client):
+    processrunning_client = ProcessWindow(client)
+    processrunning_client.process.mainloop()

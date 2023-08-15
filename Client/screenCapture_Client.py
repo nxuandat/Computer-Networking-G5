@@ -60,3 +60,6 @@ class ScreenCapture:   # Hàm dùng để chụp màn hình
         os.remove("picture.png") # Xóa ảnh trong bộ nhớ (bộ nhớ tạm thời)
         self.Screenshot.destroy() # Đóng cửa sổ lưu ảnh
 
+def screencapture(client):
+    screencapture_client = ScreenCapture(client)
+    screencapture_client.Screenshot.mainloop()
