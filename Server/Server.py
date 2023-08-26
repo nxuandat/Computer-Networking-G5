@@ -189,15 +189,15 @@ def take_Request(Client):   # Hàm nhận yêu cầu từ client
             msg = msg[2:]
             # Xóa kí tự '\n' đầu dữ liệu
             msg = msg[:len(msg)-1]
-
+            
             try:
                 cmd = 'powershell start ' + msg                 # Tạo process
                 # Gọi process và thực thi
-                subprocess.call(cmd)
+                subprocess.run(cmd, check=True)
                 # Gửi thông báo đã mở
                 Client.send(bytes("opened", "utf-8"))
                 # send(): 	Phương thức này truyền TCP message.
-            except:
+            except subprocess.CalledProcessError:
                 # Gửi thông báo không tìm thấy
                 Client.send(bytes("Not found", "utf-8"))
                 # send(): 	Phương thức này truyền TCP message.
@@ -216,8 +216,13 @@ def take_Request(Client):   # Hàm nhận yêu cầu từ client
             # Truyền tham số vào taskkill.exe
             taskkillparam = (taskkillexe, '/F',  '/IM', msg + '.exe')
             taskkillexitcode = call(taskkillparam)          # Gọi taskkill.exe
-            # Gửi thông báo đã xóa
-            Client.send(bytes("Da xoa tac vu", "utf-8"))
+            
+            if taskkillexitcode == 0:
+                # Gửi thông báo đã xóa
+                Client.send(bytes("Deleted", "utf-8"))
+            else:
+                # Gửi thông báo lỗi khi không tìm thấy file
+                Client.send(bytes("Not found", "utf-8"))
 
         elif "HookKey" == Request:                                                            # Hook key
             # Gửi thông báo đã nhận

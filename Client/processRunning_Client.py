@@ -140,14 +140,14 @@ class ProcessWindow:
         Kill_Button.grid(row=0, column=4, padx=5, pady=5) # grid cho button
 
     def kill_func(self):        # Hàm kill_func thực hiện song song hàm kill_process, thực hiện để xác nhận Input cho vào
-        self.AppName = self.Name_input.get()                # Nếu chương trình có tồn tại thì sẽ thực hiện kill_process vào thông báo thì kết thúc
-        self.client.sendall(bytes("Kill_Task", "utf-8"))    # Ngược lại sẽ thông báo lỗi và không thực hiện hàm kill_process
-        try:
-            self.client.sendall(bytes(self.AppName, "utf-8"))  # Gửi input cho server
-            self.checkdata = self.client.recv(1024).decode("utf-8") # Kiểm tra input 
-            messagebox.showinfo("", "Đã đóng chương trình")  # Thông báo 
-        except:
-            messagebox.showinfo("Error !!!", "Không tìm thấy chương trình") # Báo lỗi
+        self.AppName = self.Name_input.get()                
+        self.client.sendall(bytes("Kill_Task", "utf-8"))    
+        self.client.sendall(bytes(self.AppName, "utf-8"))  
+        self.checkdata = self.client.recv(1024).decode("utf-8") 
+        if self.checkdata == "Deleted":
+            messagebox.showinfo("", "Chương trình đã tắt")
+        else:
+            messagebox.showinfo("Error !!!", "Không tìm thấy chương trình") 
 
     def start_process(self):    # Hàm start_process tương tự như kill_process nhưng là chạy chương trình thay vì dừng
         self.screen_Start = Tk()
@@ -165,11 +165,13 @@ class ProcessWindow:
     def press_start(self):  # Hàm press_start tương tự kill_func , dùng để kiểm tra input nhập vào
         self.Name = self.Name_input.get()
         self.client.sendall(bytes("OpenTask", "utf-8"))
-        try:
-            self.client.sendall(bytes(self.Name, "utf-8"))
-            self.checkdata = self.client.recv(1024).decode("utf-8")
+        
+        self.client.sendall(bytes(self.Name, "utf-8"))
+        self.checkdata = self.client.recv(1024).decode("utf-8")
+        
+        if self.checkdata == "opened":
             messagebox.showinfo("", "Chương trình đã bật")
-        except:
+        else:
             messagebox.showinfo("Error !!!", "Không tìm thấy chương trình")
 
 

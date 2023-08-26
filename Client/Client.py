@@ -111,8 +111,7 @@ class Main:
 # Hàm khởi động các chương trình (Watch, Kill, Start)
     def application_function(self, Client):
         try:
-            appRunning_Client.application_function(
-                self, Client)  # Đọc hàm application_function
+            appRunning_Client.apprunning(Client)  # Đọc hàm application_function
         except:
             messagebox.showinfo("Error !!!", "Lỗi kết nối ")
 
