@@ -72,12 +72,3 @@ class KeystrokeClient:
 def keystroke(client):
     keystroke_client = KeystrokeClient(client)
     keystroke_client.Stroke.mainloop()
-
-
-# if __name__ == "__main__":
-#     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     HOST = 'your_server_ip_here'
-#     PORT = 1234
-#     client.connect((HOST, PORT))
-#     keystroke(client)
-#     client.close()

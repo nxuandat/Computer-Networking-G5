@@ -101,14 +101,16 @@ class Main:
 # Hàm khởi động các chương trình (Watch, Kill, Start)
     def application_function(self, Client):
         try:
-            appRunning_Client.apprunning(Client)  # Đọc hàm application_function
+            # Đọc hàm application_function
+            appRunning_Client.apprunning(Client)
         except:
             messagebox.showinfo("Error !!!", "Lỗi kết nối ")
 
 # Hàm khởi động các process (Watch, Kill, Start)
     def process_function(self, Client):
         try:
-            processRunning_Client.processrunning(Client)  # Đọc hàm process_function
+            processRunning_Client.processrunning(
+                Client)  # Đọc hàm process_function
         except:
             messagebox.showinfo("Error !!!", "Lỗi kết nối ")
 
@@ -144,7 +146,7 @@ class Main:
 
 # Hàm xử lý kết nối giữa Client - Server
     def Connection_handling(self, HOST):
-        PORT = 1234						# Đặt cổng kết nối
+        PORT = 3000						# Đặt cổng kết nối
         Client = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)       # Tạo socket
     # Kiểm tra lỗi kết nối bằng cách dùng try và except

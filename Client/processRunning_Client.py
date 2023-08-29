@@ -43,7 +43,7 @@ class ProcessWindow:
     def watch_processes(self,client): # Hàm watch_processes dùng để xem các chương trình
         global process_activity                    # Khai báo biến process_activity
         global PORT                             # Khai báo biến PORT
-        PORT = 1234                             # Khai báo PORT
+        PORT = 3000                             # Khai báo PORT
         self.length = 0                         # Khai báo biến length
         self.ID = [''] * 1000                   # Khai báo biến ID
         self.Name = [''] * 1000                 # Khai báo biến Name

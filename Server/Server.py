@@ -5,7 +5,7 @@ import pyautogui    # hỗ trợ đa nền tảng để quản lý hoạt độn
 from tkinter import *
 import Keystroke_SV
 
-PORT = 1234     # Đặt cổng kết nối
+PORT = 3000     # Đặt cổng kết nối
 SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Tạo socket
 # Tạo địa chỉ IP server và thiết lập công kết nối
@@ -178,7 +178,7 @@ def take_Request(Client):   # Hàm nhận yêu cầu từ client
             msg = msg[2:]
             # Xóa kí tự '\n' đầu dữ liệu
             msg = msg[:len(msg)-1]
-            
+
             try:
                 cmd = 'powershell start ' + msg                 # Tạo process
                 # Gọi process và thực thi
@@ -205,7 +205,7 @@ def take_Request(Client):   # Hàm nhận yêu cầu từ client
             # Truyền tham số vào taskkill.exe
             taskkillparam = (taskkillexe, '/F',  '/IM', msg + '.exe')
             taskkillexitcode = call(taskkillparam)          # Gọi taskkill.exe
-            
+
             if taskkillexitcode == 0:
                 # Gửi thông báo đã xóa
                 Client.send(bytes("Deleted", "utf-8"))
