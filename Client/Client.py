@@ -13,16 +13,6 @@ import processRunning_Client 		# process_function.py
 import appRunning_Client			# application_function.py
 import screenCapture_Client 			# screenCapture.py
 
-# AF_INET        : cho biết đang yêu cầu một socket Internet Protocol(IP), cụ thể là IPv4
-# SOCK_STREAM    : chỉ loại kết nối TCP IP hoặc UDP . Chương trình nhóm em sẽ chạy trên một cổng kết nối TCP
-# bind()         : Phương thức này gắn kết địa chỉ (host,port) tới Socket
-# listen()       : Phương thức này cho phép một cái chờ kết nối từ một các client.
-# accept()       : Phương thức này chấp nhận một cách thụ động kết nối TCP Client, đợi cho tới khi kết nối tới.
-# recv()         : Phương thức này nhận TCP message.
-# send()         : Phương thức này gửi TCP message.
-# close()        : Phương thức này đóng kết nối.
-# gethostbyname(): Trả về hostname.
-
 
 class Main:
     def __init__(self):

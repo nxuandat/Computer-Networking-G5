@@ -5,17 +5,6 @@ import pyautogui    # hỗ trợ đa nền tảng để quản lý hoạt độn
 from tkinter import *
 import Keystroke_SV
 
-
-# AF_INET        : cho biết đang yêu cầu một socket Internet Protocol(IP), cụ thể là IPv4
-# SOCK_STREAM    : chỉ loại kết nối TCP IP hoặc UDP . Chương trình nhóm em sẽ chạy trên một cổng kết nối TCP
-# bind()         : Phương thức này gắn kết địa chỉ (host,port) tới Socket
-# listen()       : Phương thức này cho phép một cái chờ kết nối từ một các client.
-# accept()       : Phương thức này chấp nhận một cách thụ động kết nối TCP Client, đợi cho tới khi kết nối tới.
-# recv()         : Phương thức này nhận TCP message.
-# send()         : Phương thức này gửi TCP message.
-# close()        : Phương thức này đóng kết nối.
-# gethostbyname(): Trả về hostname.
-
 PORT = 1234     # Đặt cổng kết nối
 SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Tạo socket
